@@ -14,6 +14,7 @@ public class ManageProduct {
 
     @GetMapping("new-products")
     List<String> getProducts(){
+        System.out.println("Endpoint hit!");  // Add this
         return Arrays.asList("Cafe machine","Air pod","mechanic board","Screen") ;
     }
 

@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import java.util.List;
 
@@ -24,11 +25,11 @@ public class SecurityConfiguration {
 
     private final UserService userDetailsService ;
     private final JwtService jwtService ;
-    private  final FirstAuthenticationFilter firstAuthenticationFilter ;
-    public SecurityConfiguration(UserService userDetailsService, JwtService jwtService, FirstAuthenticationFilter firstAuthenticationFilter) {
+    private  final JWTAuthenticationFilter jwtAuthenticationFilter;
+    public SecurityConfiguration(UserService userDetailsService, JwtService jwtService, JWTAuthenticationFilter jwtAuthenticationFilter) {
         this.userDetailsService = userDetailsService ;
         this.jwtService = jwtService;
-        this.firstAuthenticationFilter = firstAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -38,7 +39,9 @@ public class SecurityConfiguration {
                  {
                      authorizeHttp.requestMatchers("/public-products/list", "/auth/**").permitAll()
                          .anyRequest().authenticated();
-                 }).addFilterAt(firstAuthenticationFilter, BasicAuthenticationFilter.class).httpBasic(Customizer.withDefaults()).csrf(CsrfConfigurer::disable)
+                 })
+                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                 .httpBasic(Customizer.withDefaults()).csrf(CsrfConfigurer::disable)
                 .build() ;
      }
 
